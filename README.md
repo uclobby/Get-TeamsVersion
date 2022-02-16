@@ -13,11 +13,14 @@ It's recommended to run the script with elevated privileges' 
 
 Change Log
 
-v1.2 - 2022/02/14
+v1.2 - 2022/02/11
+
         Version is now extracted using Regular Expressions since ConvertFrom-Json was raising an exception in some scenarios.
 
 v1.1 - 2020/02/26
+
         Added Architecture to the output.
 
 v1.0 - 2018/09/04
+
         Initial release.
