@@ -3,7 +3,7 @@
 	This script returns the installed MS Teams Version for each user profile.
 
 .NOTES
-  Version      	   		: 1.2
+  Version      	   		: 1.3
   Author    			: David Paulino
   Info                  : https://uclobby.com/2018/08/23/teams-check-client-version-using-powershell
 
@@ -17,7 +17,7 @@
 # Identify 16-bit, 32-bit and 64-bit executables with PowerShell
 # https://gallery.technet.microsoft.com/scriptcenter/Identify-16-bit-32-bit-and-522eae75
 
-function GetArch([string]$sFilePath)
+function Get-UcArch([string]$sFilePath)
 {
 try
     {
@@ -62,37 +62,56 @@ try
         if ($null -ne $stream) { $stream.Dispose() }
     }
 }
-
-#1.2 - Using Regular Expressions instead of ConvertFrom-Json
-$regexVersion = '("version":")(\d{1,4}\.\d{1,4}.\d{1,4}\.\d{1,4})'
-
-$Profiles = (Get-childItem 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList'  | ForEach-Object {Get-ItemProperty $_.pspath } | Where-Object {$_.fullprofile -eq 1} )
-
-foreach($Profile in $Profiles){
-    $ProfilePath = $Profile.ProfileImagePath
-    $TeamsSettingPath = $ProfilePath + "\AppData\Roaming\Microsoft\Teams\settings.json"
+    $regexVersion = '("version":")([0-9.]*)'
+    $regexRing = '("ring":")(\w*)'
+    $regexEnv = '("environment":")(\w*)'
+    $regexRegion = '("region":")([a-zA-Z0-9._-]*)'
     
-    if(Test-Path $TeamsSettingPath -ErrorAction SilentlyContinue) {
-        $profileSID = New-Object System.Security.Principal.SecurityIdentifier($Profile.PSChildName)
-        $ProfileName = $profileSID.Translate( [System.Security.Principal.NTAccount]).Value
-        
-	#1.2 - Using Regular Expressions instead of ConvertFrom-Json
-        try {
+    $outTeamsVersion = [System.Collections.ArrayList]::new()
+    
+    $currentDateFormat = [cultureinfo]::CurrentCulture.DateTimeFormat.ShortDatePattern
+    $Profiles = Get-childItem 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\ProfileList' | ForEach-Object {Get-ItemProperty $_.pspath } | Where-Object {$_.fullprofile -eq 1}
+    foreach($Profile in $Profiles){
+        $TeamsSettingPath = $Profile.ProfileImagePath + "\AppData\Roaming\Microsoft\Teams\settings.json"
+        if(Test-Path $TeamsSettingPath -ErrorAction SilentlyContinue) {
             $TeamsSettings = Get-Content -Path $TeamsSettingPath
-            $Version = [regex]::Match($TeamsSettings,$regexVersion).captures.groups[2].value
-        } catch {
             $Version = ""
+            $Ring = ""
+            $Env = ""
+            $Region = ""
+            try {
+                $VersionTemp = [regex]::Match($TeamsSettings,$regexVersion).captures.groups
+                if($VersionTemp.Count -ge 2){
+                    $Version = $VersionTemp[2].value
+                }
+                $RingTemp = [regex]::Match($TeamsSettings,$regexRing).captures.groups
+                if($RingTemp.Count -ge 2){
+                    $Ring = $RingTemp[2].value
+                }
+                $EnvTemp = [regex]::Match($TeamsSettings,$regexEnv).captures.groups
+                if($EnvTemp.Count -ge 2){
+                    $Env = $EnvTemp[2].value
+                }
+                $RegionTemp = [regex]::Match($TeamsSettings,$regexRegion).captures.groups
+                if($RegionTemp.Count -ge 2){
+                    $Region = $RegionTemp[2].value
+                }
+            } catch { }
+            $TeamsApp = $Profile.ProfileImagePath + "\AppData\Local\Microsoft\Teams\current\Teams.exe"
+            $InstallDateStr = Get-Content ($Profile.ProfileImagePath + "\AppData\Roaming\Microsoft\Teams\installTime.txt")
+            $TeamsVersion = New-Object –TypeName PSObject -Property @{
+                Profile = (New-Object System.Security.Principal.SecurityIdentifier($Profile.PSChildName)).Translate( [System.Security.Principal.NTAccount]).Value
+                ProfilePath = $Profile.ProfileImagePath
+                Version = $Version
+                Ring = $Ring
+                Environment = $Env
+                Region = $Region
+                Arch = Get-UcArch $TeamsApp
+                InstallDate = [Datetime]::ParseExact($InstallDateStr, 'M/d/yyyy', $null) | Get-Date -Format $currentDateFormat
+            }
+            
+            $TeamsVersion.PSObject.TypeNAmes.Insert(0,'TeamsVersion')
+            $outTeamsVersion.Add($TeamsVersion) | Out-Null
         }
-        
-        $TeamsApp = $ProfilePath + "\AppData\Local\Microsoft\Teams\current\Teams.exe"
-        $TeamsArch = GetArch $TeamsApp
-        $InstallDate = Get-Content $ProfilePath"\AppData\Roaming\Microsoft\Teams\installTime.txt"
-        $TeamsVersion = New-Object –TypeName PSObject
-        $TeamsVersion | Add-Member –MemberType NoteProperty –Name Profile –Value $ProfileName
-        $TeamsVersion | Add-Member –MemberType NoteProperty –Name ProfilePath –Value $ProfilePath
-        $TeamsVersion | Add-Member –MemberType NoteProperty –Name Version –Value $Version
-        $TeamsVersion | Add-Member –MemberType NoteProperty –Name Arch –Value $TeamsArch
-        $TeamsVersion | Add-Member –MemberType NoteProperty –Name InstallDate –Value $InstallDate
-        Write-Output $TeamsVersion
     }
-}
+    return $outTeamsVersion
