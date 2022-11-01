@@ -15,7 +15,11 @@ Currently the script doesn’t accept any parameter.
 It's recommended to run the script with elevated privileges' 
 
 <br/>Change Log:
-<br/>
+<br/>2.0 - 2022/10/20
+<ul>
+  <li>Added Computer parameter to get Teams version on a remote machine.</li>
+  <li>Added Path parameter to specify a path that contains Teams log files.</li>
+</ul>
 <br/>1.3 - 2022/06/10
 <ul>
   <li>Fixed the issue where the version was limited to 4 digits.</li>
