@@ -3,7 +3,7 @@
 	This script returns the installed MS Teams Version for each user profile.
 
 .NOTES
-  Version      	   		: 1.3
+  Version      	   		: 2.0
   Author    			: David Paulino
   Info                  : https://uclobby.com/2018/08/23/teams-check-client-version-using-powershell
 
