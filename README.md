@@ -15,6 +15,12 @@ Currently the script doesn’t accept any parameter.
 It's recommended to run the script with elevated privileges' 
 
 <br/>Change Log:
+<br/>2.1 - 2023/12/04
+<ul>
+  <li>Feature: Add support for new Teams version.</li>
+  <li>Feature: Added Credential parameter that will be used to connect to the remote computer.</li>
+  <li>Fix: Exception handling for windows profiles that were created when the machine was joined to an another domain.</li>
+</ul>
 <br/>2.0 - 2022/10/20
 <ul>
   <li>Added Computer parameter to get Teams version on a remote machine.</li>
