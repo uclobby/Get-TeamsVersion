@@ -15,6 +15,15 @@ Currently the script doesn’t accept any parameter.
 It's recommended to run the script with elevated privileges' 
 
 <br/>Change Log:
+<br/>2.2 - 2024/03/15
+<ul>
+  <li>Feature: Add support for New Teams on a Remote Computer.</li>
+  <li>Feature: Add suport for New Teams from Path</li>
+  <li>Feature: Add column Type which will have New Teams or Classic Teams.</li>
+  <li>Change: Removed column Region.</li>
+  <li>Change: Use Get-AppPackage to determine MS Teams Instalation Path and remove the requirement of administative rights.</li>
+  <li>Fix: In some scenarios the install date was missing and generating an error.</li>
+</ul>
 <br/>2.1 - 2023/12/04
 <ul>
   <li>Feature: Add support for new Teams version.</li>
