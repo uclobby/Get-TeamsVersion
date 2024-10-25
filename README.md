@@ -10,11 +10,20 @@ Please note that as of May 18th 2022 this script was added to https://github.com
 Usage:
 Get-TeamsVersion.ps1
 
-Currently the script doesn’t accept any parameter.
-
+Parameters
+<ul>
+  <li>Path - Get Teams Version from previously downloaded log files</li>
+  <li>Computer – Specify the computer we want to collect the version from. Requires Admin Shares to be enabled.</li>
+  <li>Credential – Credential to be used to connect to the remote computer.</li>
+</ul>
 It's recommended to run the script with elevated privileges' 
 
 <br/>Change Log:
+
+<br/>2.3 - 2024/10/25
+<ul>
+  <li>Fix: No output generated for New Teams if the tma_settings.json file was missing.</li>
+</ul>
 <br/>2.2 - 2024/03/15
 <ul>
   <li>Feature: Add support for New Teams on a Remote Computer.</li>
