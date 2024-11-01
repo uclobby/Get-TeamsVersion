@@ -20,6 +20,11 @@ It's recommended to run the script with elevated privileges' 
 
 <br/>Change Log:
 
+<br/>2.4 - 2024/11/01
+<ul>
+  <li>Fix: Teams Classic was include in the output if settings file was present after Teams Classic uninstallation.</li>
+  <li>Fix: Running this in Windows 10 with PowerShell 7 an exception could be raised while importing the Appx PowerShell module. Thank you Steve Chupack for reporting this issue.</li>
+</ul>
 <br/>2.3 - 2024/10/25
 <ul>
   <li>Fix: No output generated for New Teams if the tma_settings.json file was missing.</li>
